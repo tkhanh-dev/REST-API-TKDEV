@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title id="page-title">API Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="/icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1E1A34">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#8B5CF6',
+                        'primary-darker': '#7C3AED',
+                        'text-main': '#E5E7EB',
+                        'text-muted': '#9CA3AF',
+                        'bg-container': '#1E1A34',
+                        'bg-card': 'rgba(43, 42, 62, 0.7)',
+                        'border-color': 'rgba(139, 92, 246, 0.15)',
+                        'input-bg': 'rgba(43, 42, 62, 0.5)',
+                        'input-border': 'rgba(139, 92, 246, 0.3)',
+                        'nav-bg': 'rgba(30, 26, 52, 0.95)',
+                        'nav-border': 'rgba(139, 92, 246, 0.2)',
+                        'modal-bg': '#2a2744',
+                        'success-bg': '#166534',
+                        'success-text': '#dcfce7',
+                        'error-bg': '#991b1b',
+                        'error-text': '#fee2e2',
+                        'info-bg': 'rgba(139, 92, 246, 0.1)',
+                        'info-text': '#d8b4fe',
+                        'info-border': 'rgba(139, 92, 246, 0.3)',
+                        'warning-bg': 'rgba(245, 158, 11, 0.1)',
+                        'warning-text': '#fde68a',
+                        'warning-border': 'rgba(217, 119, 6, 0.3)',
+                        'method-get-bg': 'rgba(34, 197, 94, 0.15)',
+                        'method-get-text': '#86efac',
+                        'method-get-border': 'rgba(21, 128, 61, 0.3)',
+                        'method-post-bg': 'rgba(59, 130, 246, 0.15)',
+                        'method-post-text': '#93c5fd',
+                        'method-post-border': 'rgba(37, 99, 235, 0.3)',
+                        'method-put-bg': 'rgba(245, 158, 11, 0.15)',
+                        'method-put-text': '#fcd34d',
+                        'method-put-border': 'rgba(217, 119, 6, 0.3)',
+                        'method-delete-bg': 'rgba(239, 68, 68, 0.15)',
+                        'method-delete-text': '#fca5a5',
+                        'method-delete-border': 'rgba(185, 28, 28, 0.3)',
+                        'method-patch-bg': 'rgba(168, 85, 247, 0.15)',
+                        'method-patch-text': '#d8b4fe',
+                        'method-patch-border': 'rgba(126, 34, 206, 0.3)',
+                        'method-other-bg': 'rgba(107, 114, 128, 0.15)',
+                        'method-other-text': '#d1d5db',
+                        'method-other-border': 'rgba(55, 65, 81, 0.3)',
+                    },
+                    boxShadow: {
+                        'primary-glow': '0 0 15px rgba(139, 92, 246, 0.3)',
+                        'card': '0 5px 20px rgba(0, 0, 0, 0.2)',
+                        'header': '0 2px 10px rgba(30, 26, 52, 0.2)',
+                        'nav': '0 -2px 10px rgba(30, 26, 52, 0.2)',
+                    }
+                },
+            },
+        }
+    </script>
+
+    <style>
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: contain; background-color: theme('colors.bg-container'); color: theme('colors.text-main'); }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: theme('colors.primary'); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: theme('colors.primary-darker'); }
+
+        .content-section { display: none; animation: fadeIn 0.3s ease-out; }
+        .content-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .section-title { text-align: center; font-size: 1.5rem; font-weight: 600; margin-bottom: 1.75rem; color: inherit; position: relative; padding-bottom: 0rem; }
+
+        .modal { display: none; position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.75); z-index: 1050; justify-content: center; align-items: center; padding: 1rem; animation: modalFadeIn 0.3s ease-out; }
+        .modal.show { display: flex; }
+        @keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .modal-content { padding: 1.75rem; border-radius: 16px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3); min-width: 300px; max-width: 95%; width: auto; border: 1px solid theme('colors.border-color'); background-color: theme('colors.modal-bg'); color: theme('colors.text-main'); animation: modalScaleUp 0.3s ease-out; position: relative; max-height: 90vh; display: flex; flex-direction: column; }
+        @keyframes modalScaleUp { from { transform: scale(0.95); opacity: 0.7; } to { transform: scale(1); opacity: 1; } }
+
+        .modal-content-body { overflow-y: auto; flex-grow: 1; }
+        .modal-content.success { border-left: 5px solid theme('colors.status-active'); background-color: theme('colors.success-bg'); color: theme('colors.success-text'); }
+        .modal-content.error { border-left: 5px solid theme('colors.status-offline'); background-color: theme('colors.error-bg'); color: theme('colors.error-text'); }
+
+        .nav-item { transition: color 0.2s ease-in-out; }
+        .nav-indicator { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        input:focus, textarea:focus, select:focus, button:focus-visible { outline: 2px solid theme('colors.primary') !important; outline-offset: 2px; box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2); }
+        button, .nav-item, .category-item { user-select: none; -webkit-user-select: none; }
+
+        .modal-close-button { position: absolute; top: 0.75rem; right: 0.75rem; padding: 0.5rem; border-radius: 9999px; background-color: rgba(255, 255, 255, 0.05); line-height: 1; transition: background-color 0.2s; z-index: 10; }
+        .modal-close-button:hover { background-color: rgba(255, 255, 255, 0.1); }
+
+        #side-menu { transform: translateX(-100%); transition: transform 0.3s ease-in-out; }
+        #side-menu.open { transform: translateX(0); }
+        #menu-overlay { transition: opacity 0.3s ease-in-out; }
+
+        .category-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-in-out; }
+        .category-content.open { max-height: 1000px; }
+        .category-arrow { transition: transform 0.3s ease; }
+        .category-arrow.open { transform: rotate(90deg); }
+
+        pre[class*="language-"] { background: theme('colors.input-bg'); border: 1px solid theme('colors.input-border'); border-radius: 0.5rem; padding: 1rem; font-size: 0.8rem; line-height: 1.4; overflow-x: auto; color: theme('colors.text-main'); }
+        .token.property { color: theme('colors.primary'); }
+        .token.string { color: theme('colors.method-get-text'); }
+        .token.number { color: theme('colors.method-post-text'); }
+        .token.boolean { color: theme('colors.method-post-text'); }
+        .token.null { color: theme('colors.method-delete-text'); }
+        .token.punctuation { color: theme('colors.text-muted'); }
+        .token.operator { color: theme('colors.text-muted'); }
+
+        .pulse-badge::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: inherit; box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.6);
+            animation: pulse 2s infinite; pointer-events: none;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.6); }
+            70% { box-shadow: 0 0 0 8px rgba(139, 92, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); }
+        }
+        #loadingScreen { animation: fadeOutLoading 0.5s 2.5s ease-out forwards; }
+        @keyframes fadeOutLoading { to { opacity: 0; visibility: hidden; } }
+        #loadingSpinner > div { border-top-color: theme('colors.primary'); }
+    </style>
+</head>
+
+<body class="bg-bg-container text-text-main font-poppins">
+
+    <div id="loadingScreen" class="fixed inset-0 bg-bg-container z-[100] flex flex-col items-center justify-center">
+      <div id="loadingSpinner" class="relative w-12 h-12 mb-4">
+        <div class="absolute inset-0 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+      </div>
+      <p class="text-primary text-lg font-medium">Loading Dashboard...</p>
+    </div>
+
+    <div class="max-w-md mx-auto min-h-screen pb-20 bg-bg-container shadow-lg flex flex-col relative overflow-x-hidden">
+
+        <header class="p-4 border-b bg-nav-bg border-nav-border sticky top-0 z-40 backdrop-blur-md shadow-header">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                   <img id="header-logo" src="/icon.png" alt="Logo" class="w-8 h-8 bg-primary p-1 rounded-lg">
+                   <h1 id="header-title" class="text-xl font-semibold text-inherit">Dashboard</h1>
+                   <span id="header-version" class="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">v1.0</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button id="notification-toggle" class="text-text-muted hover:text-primary transition-colors p-1.5 relative">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        <span id="notification-badge" class="absolute top-0 right-0 bg-gradient-to-r from-red-500 to-orange-500 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center hidden pulse-badge">0</span>
+                    </button>
+                    <button id="menu-button" class="text-text-muted hover:text-primary transition-colors">
+                        <i data-lucide="menu" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-grow overflow-y-auto p-5">
+            <div class="content-sections">
+
+                <section id="apis-section" class="content-section active">
+                    <div class="relative mb-5">
+                        <input type="text" id="api-search" class="w-full p-3 pl-10 rounded-lg border bg-input-bg border-input-border text-text-main placeholder-text-muted focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm" placeholder="Search APIs...">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                             <i data-lucide="search" class="w-4 h-4 text-text-muted"></i>
+                        </div>
+                    </div>
+                    <div id="api-list-container" class="space-y-4">
+                       <div id="api-list-loading" class="flex justify-center items-center py-10">
+                            <i data-lucide="loader-circle" class="w-8 h-8 text-primary animate-spin"></i>
+                       </div>
+                    </div>
+                </section>
+
+                <section id="stats-section" class="content-section">
+                     <h2 class="section-title">Dashboard Stats</h2>
+                     <div class="grid grid-cols-2 gap-4">
+                         <div class="bg-bg-card rounded-xl p-4 shadow-card border border-border-color">
+                           <h3 class="text-sm font-medium text-text-muted mb-2 flex items-center gap-1.5"><i data-lucide="package" class="w-4 h-4 text-primary"></i>Total APIs</h3>
+                           <span id="totalApis" class="text-2xl font-semibold">0</span>
+                         </div>
+                         <div class="bg-bg-card rounded-xl p-4 shadow-card border border-border-color">
+                           <h3 class="text-sm font-medium text-text-muted mb-2 flex items-center gap-1.5"><i data-lucide="folder-open" class="w-4 h-4 text-primary"></i>Categories</h3>
+                           <span id="totalCategories" class="text-2xl font-semibold">0</span>
+                         </div>
+                         <div class="bg-bg-card rounded-xl p-4 shadow-card border border-border-color">
+                           <h3 class="text-sm font-medium text-text-muted mb-2 flex items-center gap-1.5"><i data-lucide="arrow-down-circle" class="w-4 h-4 text-method-get-text"></i>GET</h3>
+                           <span id="getEndpoints" class="text-2xl font-semibold">0</span>
+                         </div>
+                         <div class="bg-bg-card rounded-xl p-4 shadow-card border border-border-color">
+                           <h3 class="text-sm font-medium text-text-muted mb-2 flex items-center gap-1.5"><i data-lucide="arrow-up-circle" class="w-4 h-4 text-method-post-text"></i>POST</h3>
+                           <span id="postEndpoints" class="text-2xl font-semibold">0</span>
+                         </div>
+                     </div>
+                      <div class="mt-6 bg-bg-card rounded-xl p-4 shadow-card border border-border-color">
+                           <h3 class="text-base font-medium text-text-main mb-3 flex items-center gap-1.5"><i data-lucide="link" class="w-4 h-4 text-primary"></i>Quick Links</h3>
+                           <div id="apiLinks" class="flex flex-wrap gap-2"></div>
+                       </div>
+                </section>
+
+                <section id="notifications-section" class="content-section">
+                    <h2 class="section-title">Notifications</h2>
+                    <div id="notifications-list" class="space-y-4">
+                         <div id="no-notifications" class="text-center text-text-muted py-6">No notifications yet.</div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <nav class="fixed bottom-0 left-0 right-0 bg-nav-bg border-t border-nav-border max-w-md mx-auto backdrop-blur-md z-50 shadow-nav">
+            <div class="relative">
+                <div class="flex justify-around items-center px-3 py-2.5">
+                    <a href="#" data-section="apis" class="nav-item flex flex-col items-center text-primary p-2 w-1/3">
+                        <i data-lucide="list" class="w-5 h-5 mb-0.5"></i><span class="text-xs font-medium">APIs</span>
+                    </a>
+                    <a href="#" data-section="stats" class="nav-item flex flex-col items-center text-text-muted p-2 w-1/3 hover:text-primary transition-colors">
+                        <i data-lucide="bar-chart-2" class="w-5 h-5 mb-0.5"></i><span class="text-xs font-medium">Stats</span>
+                    </a>
+                    <a href="#" data-section="notifications" class="nav-item flex flex-col items-center text-text-muted p-2 w-1/3 hover:text-primary transition-colors">
+                        <i data-lucide="bell" class="w-5 h-5 mb-0.5"></i><span class="text-xs font-medium">Notify</span>
+                    </a>
+                </div>
+                <div class="nav-indicator absolute bottom-0 left-0 h-1 bg-primary rounded-t-full" style="width: 33.33%"></div>
+            </div>
+        </nav>
+
+        <div id="apiResponseModal" class="modal">
+            <div class="modal-content">
+                 <button type="button" class="modal-close-button" aria-label="Close API details" onclick="closeModal('apiResponseModal')">
+                    <i data-lucide="x" class="w-4 h-4 text-text-muted"></i>
+                </button>
+                <h3 class="text-lg font-semibold mb-1 text-primary" id="apiResponseModalLabel">API Details</h3>
+                <p class="text-xs text-text-muted mb-4" id="apiResponseModalDesc">Description here.</p>
+
+                <div class="modal-content-body space-y-4 pr-2 -mr-2">
+                    <pre id="apiEndpoint" class="text-xs hidden break-all whitespace-pre-wrap"></pre>
+                    <div id="apiQueryInputContainer" class="space-y-3"></div>
+
+                    <div id="apiResponseLoading" class="hidden py-8 flex justify-center items-center gap-2 text-primary">
+                         <i data-lucide="loader-circle" class="w-5 h-5 animate-spin"></i> Fetching...
+                    </div>
+                    <div id="apiResponseContentWrapper" class="hidden">
+                         <h4 class="text-sm font-medium text-text-muted mb-2">Response:</h4>
+                         <pre id="apiResponseContent" class="language-json"></pre>
+                         <div id="apiImageResponse" class="mt-2"></div>
+                    </div>
+                     <div id="apiResponseError" class="hidden p-3 bg-error-bg text-error-text rounded-lg border border-red-700/50 text-sm"></div>
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-border-color">
+                    <button id="submitQueryBtn" class="hidden w-full bg-primary text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-primary-darker transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg shadow-primary/30 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed">
+                        <i data-lucide="send" class="w-4 h-4"></i> Submit Request
+                    </button>
+                </div>
+            </div>
+        </div>
+
+         <div id="notificationPopupModal" class="modal">
+            <div class="modal-content">
+                 <button type="button" class="modal-close-button" aria-label="Close Notifications" onclick="closeModal('notificationPopupModal')">
+                    <i data-lucide="x" class="w-4 h-4 text-text-muted"></i>
+                </button>
+                <h3 class="text-lg font-semibold mb-4 text-center text-primary">Notifications</h3>
+                 <div id="notificationPopupList" class="space-y-3 max-h-[60vh] overflow-y-auto pr-2 -mr-2 modal-content-body">
+                     <div id="no-popup-notifications" class="text-center text-text-muted py-6">No notifications.</div>
+                 </div>
+                 <div class="mt-4 pt-4 border-t border-border-color">
+                    <button id="markAllReadBtn" class="w-full bg-primary/10 text-primary py-2 rounded-lg font-medium text-xs hover:bg-primary/20 transition-colors">
+                       Mark all as read
+                    </button>
+                 </div>
+            </div>
+        </div>
+
+
+        <div id="menu-overlay" class="fixed inset-0 bg-black/60 z-[55] hidden opacity-0"></div>
+        <div id="side-menu" class="fixed top-0 left-0 bottom-0 w-72 bg-nav-bg shadow-lg z-[60] flex flex-col p-5 border-r border-nav-border">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-2.5">
+                   <img id="menu-logo" src="/icon.png" alt="Logo" class="w-8 h-8 bg-primary p-1 rounded-lg">
+                   <h2 id="menu-title" class="text-lg font-semibold text-inherit">Menu</h2>
+                </div>
+                <button id="close-menu-button" class="text-text-muted hover:text-primary p-1 rounded-full hover:bg-white/10">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <nav class="flex-grow space-y-2 overflow-y-auto">
+                 <a href="#" data-section="apis" class="side-menu-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-main bg-primary/10 font-medium">
+                     <i data-lucide="list" class="w-5 h-5 text-primary"></i>
+                     <span>APIs</span>
+                 </a>
+                 <a href="#" data-section="stats" class="side-menu-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-muted hover:text-text-main hover:bg-white/10 transition-colors">
+                     <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+                     <span>Stats</span>
+                 </a>
+                 <a href="#" data-section="notifications" class="side-menu-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-muted hover:text-text-main hover:bg-white/10 transition-colors">
+                     <i data-lucide="bell" class="w-5 h-5"></i>
+                     <span>Notifications</span>
+                 </a>
+                 <div id="side-menu-links" class="mt-4 pt-4 border-t border-border-color space-y-2">
+                    <span class="text-xs font-semibold text-text-muted block px-3 uppercase">Links</span>
+                 </div>
+            </nav>
+             <div id="developer-link-container" class="mt-auto pt-4 border-t border-nav-border"></div>
+        </div>
+
+
+    </div>
+
+    <script>
+        const html = document.documentElement;
+        lucide.createIcons();
+
+        const apiResponseModal = document.getElementById('apiResponseModal');
+        const notificationPopupModal = document.getElementById('notificationPopupModal');
+        const menuButton = document.getElementById('menu-button');
+        const sideMenu = document.getElementById('side-menu');
+        const menuOverlay = document.getElementById('menu-overlay');
+        const closeMenuButton = document.getElementById('close-menu-button');
+        const sideMenuItems = document.querySelectorAll('.side-menu-item');
+        const navItems = document.querySelectorAll('.nav-item');
+        const navIndicator = document.querySelector('.nav-indicator');
+        const contentSections = document.querySelectorAll('.content-section');
+        const apiSearchInput = document.getElementById('api-search');
+        const apiListContainer = document.getElementById('api-list-container');
+        const apiListLoading = document.getElementById('api-list-loading');
+        const notificationToggle = document.getElementById('notification-toggle');
+        const notificationBadge = document.getElementById('notification-badge');
+        const notificationPopupList = document.getElementById('notificationPopupList');
+        const noPopupNotifications = document.getElementById('no-popup-notifications');
+        const notificationsListSection = document.getElementById('notifications-list');
+        const noNotificationsSection = document.getElementById('no-notifications');
+        const markAllReadBtn = document.getElementById('markAllReadBtn');
+
+        let allApiData = [];
+        let settingsData = {};
+        let notifications = [];
+        const NOTIFICATION_STORAGE_KEY = 'api_dashboard_notifications';
+
+        const capitalizeFirstLetter = str => str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
+
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('show');
+                 if (modalId === 'notificationPopupModal') {
+                    notifications.forEach(n => n.read = true);
+                    saveNotifications();
+                    updateNotificationBadge();
+                    renderNotificationsPopup();
+                 }
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.classList.remove('show');
+        }
+
+        function openSideMenu() {
+            menuOverlay.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                sideMenu.classList.add('open');
+                menuOverlay.classList.remove('opacity-0');
+            });
+        }
+
+        function closeSideMenu() {
+            sideMenu.classList.remove('open');
+            menuOverlay.classList.add('opacity-0');
+            setTimeout(() => menuOverlay.classList.add('hidden'), 300);
+        }
+
+        function setActiveSection(sectionName) {
+            const targetSectionId = `${sectionName}-section`;
+            const targetSection = document.getElementById(targetSectionId);
+
+            contentSections.forEach(section => section.classList.remove('active'));
+            if (targetSection) targetSection.classList.add('active');
+
+            const navItemCount = navItems.length;
+            const indicatorWidthPercent = 100 / navItemCount;
+            navItems.forEach((navItem, index) => {
+                const iconElement = navItem.querySelector('i[data-lucide]') || navItem.querySelector('svg');
+                if (navItem.dataset.section === sectionName) {
+                    navItem.classList.remove('text-text-muted');
+                    navItem.classList.add('text-primary');
+                    if (navIndicator) {
+                         navIndicator.style.width = `${indicatorWidthPercent}%`;
+                         navIndicator.style.transform = `translateX(${index * 100}%)`;
+                    }
+                    if(iconElement) iconElement.classList.add('text-primary');
+                } else {
+                    navItem.classList.remove('text-primary');
+                    navItem.classList.add('text-text-muted');
+                     if(iconElement) iconElement.classList.remove('text-primary');
+                }
+            });
+
+            sideMenuItems.forEach((sideItem) => {
+                 const iconElement = sideItem.querySelector('i[data-lucide]') || sideItem.querySelector('svg');
+                 if (sideItem.dataset.section === sectionName) {
+                     sideItem.classList.add('text-text-main', 'bg-primary/10', 'font-medium');
+                     sideItem.classList.remove('text-text-muted');
+                     if(iconElement) iconElement.classList.add('text-primary');
+                 } else {
+                     sideItem.classList.remove('text-text-main', 'bg-primary/10', 'font-medium');
+                     sideItem.classList.add('text-text-muted');
+                     if(iconElement) iconElement.classList.remove('text-primary');
+                 }
+             });
+
+             closeSideMenu();
+             window.scrollTo(0, 0);
+        }
+
+        function renderApiList(categories) {
+             apiListContainer.innerHTML = '';
+             if (!categories || categories.length === 0) {
+                 apiListContainer.innerHTML = '<p class="text-center text-text-muted py-6">No APIs found matching your search.</p>';
+                 return;
+             }
+
+             categories.forEach((category, categoryIndex) => {
+                 if (!category.items || category.items.length === 0) return;
+
+                 const categoryId = `category-${categoryIndex}`;
+                 const categoryElement = document.createElement('div');
+                 categoryElement.className = 'bg-bg-card rounded-xl border border-border-color shadow-card overflow-hidden';
+
+                 const categoryHeader = document.createElement('button');
+                 categoryHeader.className = 'w-full flex items-center justify-between p-4 text-left hover:bg-primary/10 transition-colors';
+                 categoryHeader.setAttribute('aria-expanded', 'false');
+                 categoryHeader.setAttribute('aria-controls', categoryId);
+                 categoryHeader.innerHTML = `
+                     <div class="flex items-center gap-2">
+                         <span class="font-semibold text-base">${capitalizeFirstLetter(category.name)}</span>
+                         <span class="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">${category.items.length}</span>
+                     </div>
+                     <i data-lucide="chevron-down" class="w-5 h-5 category-arrow text-text-muted transition-transform"></i>
+                 `;
+
+                 const categoryContent = document.createElement('div');
+                 categoryContent.id = categoryId;
+                 categoryContent.className = 'category-content border-t border-border-color';
+
+                 category.items.forEach(item => {
+                     const method = item.method ? item.method.toLowerCase() : 'get';
+                     const methodColors = {
+                         get: 'method-get', post: 'method-post', put: 'method-put',
+                         delete: 'method-delete', patch: 'method-patch'
+                     };
+                     const colorBase = methodColors[method] || 'method-other';
+                     const bgColor = `bg-${colorBase}-bg`;
+                     const textColor = `text-${colorBase}-text`;
+                     const borderColor = `border-${colorBase}-border`;
+
+                     const itemElement = document.createElement('div');
+                     itemElement.className = 'flex items-center justify-between p-3 border-b border-border-color/50 last:border-b-0 hover:bg-primary/5 cursor-pointer transition-colors api-item';
+                     itemElement.dataset.apiPath = item.path;
+                     itemElement.dataset.apiName = item.name;
+                     itemElement.dataset.apiDesc = item.desc;
+                     itemElement.dataset.apiAuthor = item.author || '';
+                     itemElement.dataset.apiMethod = method;
+                     itemElement.innerHTML = `
+                         <span class="text-sm truncate pr-2">${capitalizeFirstLetter(item.name)}</span>
+                         <span class="${bgColor} ${textColor} border ${borderColor} px-2 py-0.5 text-xs rounded uppercase font-semibold">${method}</span>
+                     `;
+                     itemElement.addEventListener('click', () => handleApiClick(itemElement.dataset));
+                     categoryContent.appendChild(itemElement);
+                 });
+
+                 categoryElement.appendChild(categoryHeader);
+                 categoryElement.appendChild(categoryContent);
+                 apiListContainer.appendChild(categoryElement);
+
+                 categoryHeader.addEventListener('click', () => {
+                     const isExpanded = categoryHeader.getAttribute('aria-expanded') === 'true';
+                     categoryHeader.setAttribute('aria-expanded', !isExpanded);
+                     categoryContent.classList.toggle('open', !isExpanded);
+                     categoryHeader.querySelector('.category-arrow').classList.toggle('open', !isExpanded);
+                 });
+             });
+             lucide.createIcons();
+         }
+
+        function filterApiList() {
+             const searchTerm = apiSearchInput.value.toLowerCase().trim();
+             if (!allApiData.categories) return;
+
+             if (searchTerm === '') {
+                 renderApiList(allApiData.categories);
+                 return;
+             }
+
+             const filteredCategories = allApiData.categories.map(category => {
+                 const filteredItems = category.items.filter(item =>
+                     item.name.toLowerCase().includes(searchTerm) ||
+                     item.desc.toLowerCase().includes(searchTerm) ||
+                     item.path.toLowerCase().includes(searchTerm)
+                 );
+                 return { ...category, items: filteredItems };
+             }).filter(category => category.items.length > 0);
+
+             renderApiList(filteredCategories);
+
+             document.querySelectorAll('.category-content').forEach(content => content.classList.add('open'));
+             document.querySelectorAll('.category-arrow').forEach(arrow => arrow.classList.add('open'));
+             document.querySelectorAll('.category-item-header').forEach(header => header.setAttribute('aria-expanded', 'true'));
+         }
+
+         function handleApiClick(dataset) {
+            const { apiPath, apiName, apiDesc, apiAuthor, apiMethod } = dataset;
+            const method = apiMethod ? apiMethod.toLowerCase() : 'get';
+
+            const modalRefs = {
+                label: document.getElementById('apiResponseModalLabel'),
+                desc: document.getElementById('apiResponseModalDesc'),
+                content: document.getElementById('apiResponseContent'),
+                contentWrapper: document.getElementById('apiResponseContentWrapper'),
+                imageResponse: document.getElementById('apiImageResponse'),
+                errorContainer: document.getElementById('apiResponseError'),
+                endpoint: document.getElementById('apiEndpoint'),
+                spinner: document.getElementById('apiResponseLoading'),
+                queryInputContainer: document.getElementById('apiQueryInputContainer'),
+                submitBtn: document.getElementById('submitQueryBtn')
+            };
+
+             modalRefs.label.textContent = capitalizeFirstLetter(apiName);
+             const capitalizedAuthor = apiAuthor ? ` | Author: ${capitalizeFirstLetter(apiAuthor)}` : '';
+             modalRefs.desc.textContent = `${capitalizeFirstLetter(apiDesc)}${capitalizedAuthor}`;
+             modalRefs.content.innerHTML = '';
+             modalRefs.imageResponse.innerHTML = '';
+             modalRefs.endpoint.textContent = '';
+             modalRefs.errorContainer.textContent = '';
+             modalRefs.spinner.classList.add('hidden');
+             modalRefs.contentWrapper.classList.add('hidden');
+             modalRefs.endpoint.classList.add('hidden');
+             modalRefs.errorContainer.classList.add('hidden');
+             modalRefs.queryInputContainer.innerHTML = '';
+             modalRefs.submitBtn.classList.add('hidden');
+             modalRefs.submitBtn.disabled = true;
+             modalRefs.submitBtn.onclick = null;
+
+             let baseApiUrl = `${window.location.origin}${apiPath.split('?')[0]}`;
+             let paramsString = apiPath.split('?')[1] || '';
+             let params = new URLSearchParams(paramsString);
+             let hasParams = false;
+
+             modalRefs.queryInputContainer.innerHTML = '';
+             Array.from(params.keys()).forEach(param => {
+                hasParams = true;
+                const inputGroup = document.createElement('div');
+                inputGroup.className = 'flex flex-col';
+                const label = document.createElement('label');
+                label.htmlFor = `param-${param}`;
+                label.className = 'text-xs font-medium text-text-muted mb-1 flex items-center gap-1';
+                label.innerHTML = `<i data-lucide="terminal" class="w-3 h-3"></i> ${capitalizeFirstLetter(param)}`;
+                const inputField = document.createElement('input');
+                inputField.type = 'text';
+                inputField.id = `param-${param}`;
+                inputField.className = 'w-full p-2.5 rounded-lg border bg-input-bg border-input-border text-text-main placeholder-text-muted focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-sm';
+                inputField.placeholder = `Enter ${param}...`;
+                inputField.dataset.param = param;
+                inputField.required = true;
+                inputField.addEventListener('input', validateModalInputs);
+                inputGroup.appendChild(label);
+                inputGroup.appendChild(inputField);
+                modalRefs.queryInputContainer.appendChild(inputGroup);
+             });
+             lucide.createIcons();
+
+             if (hasParams) {
+                 modalRefs.submitBtn.classList.remove('hidden');
+                 validateModalInputs();
+                 modalRefs.submitBtn.onclick = async () => {
+                     const inputs = modalRefs.queryInputContainer.querySelectorAll('input[data-param]');
+                     const data = {};
+                     let isValid = true;
+                     inputs.forEach(input => {
+                         const value = input.value.trim();
+                         if (!value) {
+                             isValid = false;
+                             input.classList.add('border-red-500', 'focus:ring-red-500/20');
+                         } else {
+                             input.classList.remove('border-red-500', 'focus:ring-red-500/20');
+                             data[input.dataset.param] = value;
+                         }
+                     });
+
+                     if (!isValid) return;
+
+                     modalRefs.queryInputContainer.innerHTML = '<p class="text-xs text-text-muted">Parameters submitted...</p>';
+                     modalRefs.submitBtn.classList.add('hidden');
+
+                     if (method === 'get') {
+                         const newParams = new URLSearchParams(data);
+                         const apiUrlWithParams = `${baseApiUrl}?${newParams.toString()}`;
+                         handleApiRequest(apiUrlWithParams, modalRefs, apiName, 'get');
+                     } else if (method === 'post') {
+                         handleApiRequest(baseApiUrl, modalRefs, apiName, 'post', data);
+                     }
+                 };
+             } else {
+                 handleApiRequest(baseApiUrl, modalRefs, apiName, method);
+             }
+
+             openModal('apiResponseModal');
+         }
+
+        function validateModalInputs() {
+             const submitBtn = document.getElementById('submitQueryBtn');
+             const inputs = document.querySelectorAll('#apiQueryInputContainer input[data-param]');
+             if (!submitBtn || inputs.length === 0) return;
+
+             const allFilled = Array.from(inputs).every(input => input.value.trim() !== '');
+             submitBtn.disabled = !allFilled;
+        }
+
+         async function handleApiRequest(apiUrl, modalRefs, apiName, method = 'get', bodyData = null) {
+             modalRefs.spinner.classList.remove('hidden');
+             modalRefs.contentWrapper.classList.add('hidden');
+             modalRefs.errorContainer.classList.add('hidden');
+             modalRefs.endpoint.classList.add('hidden');
+             modalRefs.imageResponse.innerHTML = '';
+             modalRefs.content.innerHTML = '';
+
+             try {
+                 const fetchOptions = { method: method.toUpperCase() };
+                 if (method === 'post' && bodyData) {
+                     fetchOptions.headers = { 'Content-Type': 'application/json' };
+                     fetchOptions.body = JSON.stringify(bodyData);
+                 }
+
+                 const response = await fetch(apiUrl, fetchOptions);
+
+                 modalRefs.endpoint.textContent = `${method.toUpperCase()} ${apiUrl}`;
+                 modalRefs.endpoint.classList.remove('hidden');
+
+                 if (!response.ok) {
+                     let errorData;
+                     try {
+                         errorData = await response.json();
+                     } catch (e) {
+                         errorData = { message: await response.text() || `HTTP error! Status: ${response.status}` };
+                     }
+                     throw new Error(errorData.message || `Request failed with status ${response.status}`);
+                 }
+
+                 const contentType = response.headers.get('content-type');
+
+                 if (contentType && contentType.includes('application/json')) {
+                     const data = await response.json();
+                     const formattedJson = JSON.stringify(data, null, 2);
+                     modalRefs.content.textContent = formattedJson;
+                     highlightSyntax(modalRefs.content);
+                     modalRefs.contentWrapper.classList.remove('hidden');
+                 } else if (contentType && contentType.startsWith('image/')) {
+                     const blob = await response.blob();
+                     const imageUrl = URL.createObjectURL(blob);
+                     modalRefs.imageResponse.innerHTML = `<img src="${imageUrl}" alt="API Response Image" class="max-w-full h-auto rounded-lg border border-border-color">`;
+                     modalRefs.contentWrapper.classList.remove('hidden');
+                 } else {
+                     const textData = await response.text();
+                     modalRefs.content.textContent = textData;
+                     modalRefs.contentWrapper.classList.remove('hidden');
+                 }
+
+             } catch (error) {
+                 console.error('API Request Error:', error);
+                 modalRefs.errorContainer.textContent = `Error: ${error.message}`;
+                 modalRefs.errorContainer.classList.remove('hidden');
+             } finally {
+                 modalRefs.spinner.classList.add('hidden');
+             }
+         }
+
+         function highlightSyntax(element) {
+             const jsonText = element.textContent;
+             element.innerHTML = jsonText.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, (match) => {
+                 let cls = 'token number';
+                 if (/^"/.test(match)) {
+                     cls = /:$/.test(match) ? 'token property' : 'token string';
+                 } else if (/true|false/.test(match)) {
+                     cls = 'token boolean';
+                 } else if (/null/.test(match)) {
+                     cls = 'token null';
+                 }
+                 return `<span class="${cls}">${match}</span>`;
+             });
+         }
+
+        function loadNotifications() {
+          const saved = localStorage.getItem(NOTIFICATION_STORAGE_KEY);
+          return saved ? JSON.parse(saved) : [];
+        }
+
+        function saveNotifications() {
+          localStorage.setItem(NOTIFICATION_STORAGE_KEY, JSON.stringify(notifications));
+        }
+
+        function updateNotificationBadge() {
+          const unreadCount = notifications.filter(n => !n.read).length;
+          notificationBadge.textContent = unreadCount;
+          notificationBadge.classList.toggle('hidden', unreadCount === 0);
+        }
+
+        function renderNotificationsPopup() {
+           notificationPopupList.innerHTML = '';
+           const sortedNotifications = [...notifications].sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+
+           if (sortedNotifications.length === 0) {
+               noPopupNotifications.classList.remove('hidden');
+               markAllReadBtn.classList.add('hidden');
+               return;
+           }
+
+           noPopupNotifications.classList.add('hidden');
+           markAllReadBtn.classList.remove('hidden');
+
+           sortedNotifications.forEach((notification, index) => {
+               const item = document.createElement('div');
+               item.className = `p-3 rounded-lg border flex items-start gap-3 ${notification.read ? 'bg-bg-card border-border-color' : 'bg-info-bg border-info-border'}`;
+               const icon = notification.read ? 'mail-open' : 'mail';
+               const color = notification.read ? 'text-text-muted' : 'text-primary';
+               item.innerHTML = `
+                 <i data-lucide="${icon}" class="w-5 h-5 ${color} flex-shrink-0 mt-0.5"></i>
+                 <div class="flex-1">
+                   <h4 class="font-semibold text-sm mb-0.5 ${notification.read ? 'text-text-main' : 'text-info-text'}">${notification.title}</h4>
+                   <p class="text-xs ${notification.read ? 'text-text-muted' : 'text-info-text'}">${notification.message}</p>
+                   ${notification.timestamp ? `<p class="text-xs text-text-muted mt-1">${new Date(notification.timestamp).toLocaleString()}</p>` : ''}
+                 </div>
+                 ${!notification.read ? '<div class="w-2 h-2 rounded-full bg-primary mt-1 flex-shrink-0 animate-pulse"></div>' : ''}
+               `;
+               notificationPopupList.appendChild(item);
+           });
+           lucide.createIcons();
+        }
+
+        function renderNotificationsSection() {
+            notificationsListSection.innerHTML = '';
+            const sortedNotifications = [...notifications].sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+
+            if (sortedNotifications.length === 0) {
+                noNotificationsSection.classList.remove('hidden');
+                return;
+            }
+            noNotificationsSection.classList.add('hidden');
+
+             const typeMap = {
+                 'info': { icon: 'info', bg: 'bg-info-bg', text: 'text-info-text', border: 'border-info-border', iconColor: 'text-primary' },
+                 'warning': { icon: 'alert-triangle', bg: 'bg-warning-bg', text: 'text-warning-text', border: 'border-warning-border', iconColor: 'text-yellow-400' },
+                 'success': { icon: 'check-circle', bg: 'bg-success-bg', text: 'text-success-text', border: 'border-green-700/50', iconColor: 'text-green-400' },
+                 'error': { icon: 'alert-circle', bg: 'bg-error-bg', text: 'text-error-text', border: 'border-red-700/50', iconColor: 'text-red-400' }
+             };
+
+            sortedNotifications.forEach(notification => {
+                const type = notification.type || 'info';
+                const styles = typeMap[type] || typeMap['info'];
+                const item = document.createElement('div');
+                item.className = `flex items-start gap-3 p-3.5 ${styles.bg} rounded-lg border ${styles.border} shadow-sm`;
+                item.innerHTML = `
+                    <i data-lucide="${styles.icon}" class="w-5 h-5 ${styles.iconColor} flex-shrink-0 mt-0.5"></i>
+                    <div class="flex-1">
+                      <span class="text-sm ${styles.text}">${notification.title}: ${notification.message}</span>
+                       ${notification.timestamp ? `<p class="text-xs text-text-muted mt-1">${new Date(notification.timestamp).toLocaleString()}</p>` : ''}
+                    </div>
+                `;
+                notificationsListSection.appendChild(item);
+            });
+            lucide.createIcons();
+        }
+
+        function initializeNotifications(settingNotifications) {
+            const storedNotifications = loadNotifications();
+            const combinedNotifications = new Map();
+
+            storedNotifications.forEach(n => combinedNotifications.set(n.id || (n.title + n.message), n));
+
+            if (Array.isArray(settingNotifications)) {
+                settingNotifications.forEach(n => {
+                    const id = n.id || (n.title + n.message);
+                    if (!combinedNotifications.has(id)) {
+                        combinedNotifications.set(id, { ...n, read: false, timestamp: Date.now() });
+                    } else {
+                         const existing = combinedNotifications.get(id);
+                         combinedNotifications.set(id, { ...n, read: existing.read, timestamp: existing.timestamp || Date.now() });
+                    }
+                });
+            }
+
+            notifications = Array.from(combinedNotifications.values());
+            saveNotifications();
+            updateNotificationBadge();
+            renderNotificationsPopup();
+            renderNotificationsSection();
+        }
+
+        function setupDynamicContent(settings) {
+             document.getElementById('page-title').textContent = settings.name || 'API Dashboard';
+             document.getElementById('header-title').textContent = settings.name || 'Dashboard';
+             document.getElementById('menu-title').textContent = settings.name || 'Menu';
+             document.getElementById('header-version').textContent = settings.version || 'v1.0';
+
+             if (settings.logoSrc) {
+                 document.getElementById('header-logo').src = settings.logoSrc;
+                 document.getElementById('menu-logo').src = settings.logoSrc;
+             }
+
+             const apiLinksContainer = document.getElementById('apiLinks');
+             const sideMenuLinksContainer = document.getElementById('side-menu-links');
+             const devLinkContainer = document.getElementById('developer-link-container');
+             apiLinksContainer.innerHTML = '';
+             sideMenuLinksContainer.innerHTML = '<span class="text-xs font-semibold text-text-muted block px-3 uppercase">Links</span>';
+             devLinkContainer.innerHTML = '';
+
+             if (settings.links && settings.links.length > 0) {
+                 settings.links.forEach(link => {
+                     const linkEl = document.createElement('a');
+                     linkEl.href = link.url;
+                     linkEl.target = '_blank';
+                     linkEl.rel = 'noopener noreferrer';
+                     linkEl.className = 'inline-block bg-primary/10 text-primary text-xs font-medium px-3 py-1.5 rounded-full hover:bg-primary/20 transition-colors';
+                     linkEl.textContent = link.name;
+                     apiLinksContainer.appendChild(linkEl);
+
+                     const sideMenuLink = document.createElement('a');
+                     sideMenuLink.href = link.url;
+                     sideMenuLink.target = '_blank';
+                     sideMenuLink.rel = 'noopener noreferrer';
+                     sideMenuLink.className = 'flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-muted hover:text-text-main hover:bg-white/10 transition-colors';
+                     sideMenuLink.innerHTML = `<i data-lucide="link-2" class="w-5 h-5"></i><span>${link.name}</span>`;
+                     sideMenuLinksContainer.appendChild(sideMenuLink);
+                 });
+             } else {
+                 apiLinksContainer.innerHTML = '<p class="text-xs text-text-muted">No links available.</p>';
+                 sideMenuLinksContainer.classList.add('hidden');
+             }
+
+             if (settings.developerLink) {
+                 const devLink = document.createElement('a');
+                 devLink.href = settings.developerLink.url;
+                 devLink.target = '_blank';
+                 devLink.rel = 'noopener noreferrer';
+                 devLink.className = 'flex items-center justify-center gap-2 w-full bg-primary/10 text-primary py-2.5 px-4 rounded-lg font-semibold text-sm hover:bg-primary/20 transition-all duration-300 shadow-sm active:scale-[0.98]';
+                 devLink.innerHTML = `<i data-lucide="code" class="w-4 h-4"></i><span>${settings.developerLink.name || 'Developer Profile'}</span>`;
+                 devLinkContainer.appendChild(devLink);
+             }
+
+             lucide.createIcons();
+        }
+
+        function setupStats(apiInfo) {
+             let totalApis = 0, getEndpoints = 0, postEndpoints = 0;
+             if (apiInfo.categories) {
+                 apiInfo.categories.forEach(category => {
+                     totalApis += category.items.length;
+                     category.items.forEach(item => {
+                         const method = item.method ? item.method.toLowerCase() : 'get';
+                         if (method === 'get') getEndpoints++;
+                         else if (method === 'post') postEndpoints++;
+                     });
+                 });
+             }
+             document.getElementById('totalApis').textContent = totalApis;
+             document.getElementById('totalCategories').textContent = apiInfo.categories ? apiInfo.categories.length : 0;
+             document.getElementById('getEndpoints').textContent = getEndpoints;
+             document.getElementById('postEndpoints').textContent = postEndpoints;
+        }
+
+        async function initializeApp() {
+             try {
+                 const [settingsResponse, apiInfoResponse] = await Promise.all([
+                     fetch('/settings.json'),
+                     fetch('/api/info')
+                 ]);
+
+                 if (!settingsResponse.ok) throw new Error(`Failed to load settings: ${settingsResponse.statusText}`);
+                 if (!apiInfoResponse.ok) throw new Error(`Failed to load API info: ${apiInfoResponse.statusText}`);
+
+                 settingsData = await settingsResponse.json();
+                 allApiData = await apiInfoResponse.json();
+
+                 setupDynamicContent(settingsData);
+                 setupStats(allApiData);
+
+                 const sortedCategories = allApiData.categories ? [...allApiData.categories].sort((a, b) => a.name.localeCompare(b.name)) : [];
+                 allApiData.categories = sortedCategories.map(cat => ({
+                    ...cat,
+                    items: cat.items ? [...cat.items].sort((a, b) => a.name.localeCompare(b.name)) : []
+                 }));
+
+                 apiListLoading.classList.add('hidden');
+                 renderApiList(allApiData.categories);
+                 initializeNotifications(settingsData.notifications);
+
+             } catch (error) {
+                 console.error("Initialization failed:", error);
+                 apiListContainer.innerHTML = `<p class="text-center text-error-text py-6">Error loading dashboard data: ${error.message}</p>`;
+                 apiListLoading.classList.add('hidden');
+             } finally {
+                 document.getElementById('loadingScreen').style.display = 'none';
+             }
+         }
+
+        if(menuButton) menuButton.addEventListener('click', openSideMenu);
+        if(closeMenuButton) closeMenuButton.addEventListener('click', closeSideMenu);
+        if(menuOverlay) menuOverlay.addEventListener('click', closeSideMenu);
+
+        navItems.forEach((item) => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                setActiveSection(this.dataset.section);
+            });
+        });
+
+        sideMenuItems.forEach((item) => {
+             item.addEventListener('click', function(e) {
+                 e.preventDefault();
+                 setActiveSection(this.dataset.section);
+             });
+         });
+
+        apiSearchInput.addEventListener('input', filterApiList);
+
+        notificationToggle.addEventListener('click', () => openModal('notificationPopupModal'));
+
+        markAllReadBtn.addEventListener('click', () => {
+            notifications.forEach(n => n.read = true);
+            saveNotifications();
+            updateNotificationBadge();
+            renderNotificationsPopup();
+            renderNotificationsSection();
+        });
+
+        [apiResponseModal, notificationPopupModal].forEach(modal => {
+             if (modal) {
+                 modal.addEventListener('click', (event) => {
+                     if (event.target === modal) closeModal(modal.id);
+                 });
+             }
+         });
+
+        document.addEventListener('keydown', (e) => {
+             if (e.key === 'Escape') {
+                 closeModal('apiResponseModal');
+                 closeModal('notificationPopupModal');
+                 closeSideMenu();
+             }
+             if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                 e.preventDefault();
+                 setActiveSection('apis');
+                 apiSearchInput.focus();
+             }
+         });
+
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
+    </script>
+
+</body>
+</html>

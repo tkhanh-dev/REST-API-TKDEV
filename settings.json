@@ -1,0 +1,39 @@
+{
+  "name": "Zen Api",
+  "version": "Zen UI",
+  "description": "Simple and Easy-to-Use API Documentation",
+  "header": {
+    "status": "Online!",
+    "imageSrc": [
+      "https://media4.giphy.com/media/l0Iy33dWjmywkCnNS/giphy.gif?cid=6c09b952p3mt40j1mgznfi9rwwtccbjl7mtc2kvfugymeinr&ep=v1_internal_gif_by_id&rid=giphy.gif&ct=g"
+    ],
+    "imageSize": {
+      "mobile": "80%",
+      "tablet": "40%",
+      "desktop": "40%"
+    }
+  },
+  "apiSettings": {
+    "creator": "joshua Apostol"
+  },
+  "links": [
+    {
+      "name": "Source Code",
+      "url": "https://github.com/joshuaAposto"
+    },
+    {
+      "name": "Contact Me",
+      "url": "https://www.facebook.com/joshuaapostol2006"
+    }
+  ],
+  "notifications": [
+    {
+      "title": "Welcome to API Dashboard",
+      "message": "Explore our APIs and integrate them into your projects."
+    },
+    {
+      "title": "New Design",
+      "message": "New design for the Zen Rest API"
+    }
+  ]
+}
