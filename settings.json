@@ -1,9 +1,9 @@
 {
-  "name": "Zen Api",
-  "version": "Zen UI",
+  "name": "TKDEV - API,
+  "version": "1.0.0",
   "description": "Simple and Easy-to-Use API Documentation",
   "header": {
-    "status": "Online!",
+    "status": "Online",
     "imageSrc": [
       "https://media4.giphy.com/media/l0Iy33dWjmywkCnNS/giphy.gif?cid=6c09b952p3mt40j1mgznfi9rwwtccbjl7mtc2kvfugymeinr&ep=v1_internal_gif_by_id&rid=giphy.gif&ct=g"
     ],
@@ -14,16 +14,12 @@
     }
   },
   "apiSettings": {
-    "creator": "joshua Apostol"
+    "creator": "TKDEV"
   },
   "links": [
     {
-      "name": "Source Code",
-      "url": "https://github.com/joshuaAposto"
-    },
-    {
       "name": "Contact Me",
-      "url": "https://www.facebook.com/joshuaapostol2006"
+      "url": "https://www.facebook.com/tkhanh.dev"
     }
   ],
   "notifications": [
@@ -33,7 +29,7 @@
     },
     {
       "title": "New Design",
-      "message": "New design for the Zen Rest API"
+      "message": "New design for the Rest API"
     }
   ]
 }
