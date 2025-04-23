@@ -1,6 +1,6 @@
-# Zen API
+# TKDEV-API
 
-Zen API is a modern, interactive API documentation and testing interface built with HTML, Tailwind CSS, and JavaScript. It provides a sleek, dark-themed dashboard for developers to explore, test, and integrate API endpoints with ease.
+TKDEV-API is a modern, interactive API documentation and testing interface built with HTML, Tailwind CSS, and JavaScript. It provides a sleek, dark-themed dashboard for developers to explore, test, and integrate API endpoints with ease.
 
 ## Features
 
@@ -16,7 +16,7 @@ Zen API is a modern, interactive API documentation and testing interface built w
 
 ## Live Demo
 
-Check out a live demo of Zen API [here](https://zen-api.up.railway.app)
+Check out a live demo of Zen API [here](https://.up.railway.app)
 
 ## Setup
 
@@ -56,7 +56,7 @@ Your API documentation should now be available at `http://localhost:4000`.
 
 ## Creating API Endpoints
 
-Zen API makes it easy to create and document API endpoints. Each endpoint is defined as a Node.js module with metadata and a handler function.
+TKDEV-API makes it easy to create and document API endpoints. Each endpoint is defined as a Node.js module with metadata and a handler function.
 
 ### Example API Endpoint
 
@@ -278,6 +278,7 @@ This project is created and maintained by:
 - **[Rynn](https://github.com/rynxzyy)**: Creator and main developer of the project.
 - **[Lenwy](https://github.com/Lenwyy)**: For the inspiration behind the project.
 - **[AjiroDesu](https://github.com/ajirodesu)**: The one who modify the entire API functionality and Website's ui and ux.
+- **[TKDEV](https://github.com/tkhanh-dev)**: Add some functions and fix HTML
 
 Special thanks for the support and contributions throughout the development.
 
