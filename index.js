@@ -1,145 +1,118 @@
 const express = require('express');
-const fs = require('fs');
 const path = require('path');
-const chalk = require('chalk');
-const cors = require('cors');
+const fs = require('fs').promises;
+const logger = require('winston');
+const ApiError = require('./apiError');
+const config = require('./config');
 
 const app = express();
-const PORT = process.env.PORT || 4000;
 
-app.enable("trust proxy");
-app.set("json spaces", 2);
+// Logger configuration
+logger.configure({
+  transports: [
+    new logger.transports.Console(),
+    new logger.transports.File({ filename: 'app.log' })
+  ]
+});
 
-// Middleware to parse JSON and URL-encoded bodies, ensuring req.body is available for POST APIs
+// Middleware
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cors());
+app.use(express.static(path.join(__dirname, 'web')));
 
-// Serve static files from the "web" folder
-app.use('/', express.static(path.join(__dirname, 'web')));
+// API Info endpoint
+app.get('/api/info', async (req, res, next) => {
+  try {
+    const apiDir = path.join(__dirname, 'api');
+    const categories = await Promise.all(
+      (await fs.readdir(apiDir)).map(async category => {
+        const categoryPath = path.join(apiDir, category);
+        const stat = await fs.stat(categoryPath);
+        if (!stat.isDirectory()) return null;
 
-// Expose settings.json at the root
-app.get('/settings.json', (req, res) => {
-  res.sendFile(path.join(__dirname, 'settings.json'));
+        const items = await Promise.all(
+          (await fs.readdir(categoryPath)).map(async method => {
+            const methodPath = path.join(categoryPath, method);
+            const stat = await fs.stat(methodPath);
+            if (!stat.isDirectory()) return null;
+
+            return Promise.all(
+              (await fs.readdir(methodPath))
+                .filter(file => file.endsWith('.js'))
+                .map(async file => {
+                  const module = require(path.join(methodPath, file));
+                  return {
+                    name: module.name || file.replace('.js', ''),
+                    desc: module.desc || 'No description available',
+                    path: `/api/${category}/${method}/${file.replace('.js', '')}`,
+                    method: method.toUpperCase(),
+                    author: module.author || 'TKDEV Team'
+                  };
+                })
+            );
+          })
+        );
+        return { name: category, items: items.flat().filter(Boolean) };
+      })
+    );
+    res.json({ categories: categories.filter(Boolean) });
+  } catch (error) {
+    next(new ApiError(500, 'Failed to load API info', error.message));
+  }
 });
 
-// Load settings for middleware
-const settingsPath = path.join(__dirname, 'settings.json');
-const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+// Dynamic API route loading
+(async () => {
+  const apiDir = path.join(__dirname, 'api');
+  for (const category of await fs.readdir(apiDir)) {
+    const categoryPath = path.join(apiDir, category);
+    const stat = await fs.stat(categoryPath);
+    if (!stat.isDirectory()) continue;
 
-// Middleware to augment JSON responses, compatible with users.js responses
-app.use((req, res, next) => {
-  const originalJson = res.json;
-  res.json = function (data) {
-    if (data && typeof data === 'object') {
-      const responseData = {
-        status: data.status,
-        creator: (settings.apiSettings && settings.apiSettings.creator) || "Created Using Rynn UI",
-        ...data
-      };
-      return originalJson.call(this, responseData);
-    }
-    return originalJson.call(this, data);
-  };
-  next();
-});
+    for (const method of await fs.readdir(categoryPath)) {
+      const methodPath = path.join(categoryPath, method);
+      if (!(await fs.stat(methodPath)).isDirectory()) continue;
 
-// Load API modules from the "api" folder and its subfolders recursively
-const apiFolder = path.join(__dirname, 'api');
-let totalRoutes = 0;
-const apiModules = [];
-
-// Recursive function to load modules
-const loadModules = (dir) => {
-  fs.readdirSync(dir).forEach((file) => {
-    const filePath = path.join(dir, file);
-    if (fs.statSync(filePath).isDirectory()) {
-      loadModules(filePath); // Recurse into subfolder
-    } else if (fs.statSync(filePath).isFile() && path.extname(file) === '.js') {
-      try {
-        const module = require(filePath);
-        // Validate module structure expected by index.js
-        if (!module.meta || !module.onStart || typeof module.onStart !== 'function') {
-          console.warn(chalk.bgHex('#FF9999').hex('#333').bold(`Invalid module in ${filePath}: Missing or invalid meta/onStart`));
-          return;
+      for (const file of (await fs.readdir(methodPath)).filter(f => f.endsWith('.js'))) {
+        try {
+          const module = require(path.join(methodPath, file));
+          const route = `/api/${category}/${method}/${file.replace('.js', '')}`;
+          app[method.toLowerCase()](route, async (req, res, next) => {
+            try {
+              if (module.onStart) await module.onStart();
+              await module.handler(req, res, next);
+            } catch (error) {
+              next(new ApiError(500, `Failed to execute ${route}`, error.message));
+            }
+          });
+          logger.info(`Loaded API route: ${method.toUpperCase()} ${route}`);
+        } catch (error) {
+          logger.error(`Failed to load module ${file}: ${error.message}`);
         }
-
-        const basePath = module.meta.path.split('?')[0];
-        const routePath = '/api' + basePath; // Prepends /api, compatible with users.js path
-        const method = (module.meta.method || 'get').toLowerCase(); // Handles 'post' from users.js
-        app[method](routePath, (req, res) => {
-          console.log(chalk.bgHex('#99FF99').hex('#333').bold(`Handling ${method.toUpperCase()} request for ${routePath}`));
-          module.onStart({ req, res }); // Passes req and res to users.js onStart
-        });
-        apiModules.push({
-          name: module.meta.name,
-          description: module.meta.description,
-          category: module.meta.category,
-          path: routePath + (module.meta.path.includes('?') ? '?' + module.meta.path.split('?')[1] : ''),
-          author: module.meta.author,
-          method: module.meta.method || 'get'
-        });
-        totalRoutes++;
-        console.log(chalk.bgHex('#FFFF99').hex('#333').bold(`Loaded Route: ${module.meta.name} (${method.toUpperCase()})`));
-      } catch (error) {
-        console.error(chalk.bgHex('#FF9999').hex('#333').bold(`Error loading module ${filePath}: ${error.message}`));
       }
     }
-  });
-};
+  }
+})();
 
-loadModules(apiFolder);
-
-console.log(chalk.bgHex('#90EE90').hex('#333').bold('Load Complete! ✓'));
-console.log(chalk.bgHex('#90EE90').hex('#333').bold(`Total Routes Loaded: ${totalRoutes}`));
-
-// Endpoint to expose API metadata
-app.get('/api/info', (req, res) => {
-  const categories = {};
-  apiModules.forEach(module => {
-    if (!categories[module.category]) {
-      categories[module.category] = { name: module.category, items: [] };
-    }
-    categories[module.category].items.push({
-      name: module.name,
-      desc: module.description,
-      path: module.path,
-      author: module.author,
-      method: module.method
-    });
-  });
-  res.json({ categories: Object.values(categories) });
+// Error handling middleware
+app.use((req, res, next) => {
+  next(new ApiError(404, 'Route not found'));
 });
 
-// Serve index.html for the root route
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'web', 'portal.html'));
-});
-
-// Add route for the test POST API form
-app.get('/test-post', (req, res) => {
-  res.sendFile(path.join(__dirname, 'web', 'test-post.html'));
-});
-
-app.get('/docs', (req, res) => {
-  res.sendFile(path.join(__dirname, 'web', 'docs.html'));
-});
-
-// 404 error handler
-app.use((req, res) => {
-  console.log(`404 Not Found: ${req.url}`);
-  res.status(404).sendFile(path.join(__dirname, 'web', '404.html'));
-});
-
-// 500 error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).sendFile(path.join(__dirname, 'web', '500.html'));
+  logger.error(`Server Error: ${err.stack}`);
+  if (err instanceof ApiError) {
+    res.status(err.statusCode).json({
+      status: false,
+      error: err.message,
+      detail: err.detail
+    });
+  } else {
+    res.status(500).sendFile(path.join(__dirname, 'web', '500.html'));
+  }
 });
 
-// Start the server
+// Start server
+const PORT = config.port || 3000;
 app.listen(PORT, () => {
-  console.log(chalk.bgHex('#90EE90').hex('#333').bold(`Server is running on port ${PORT}`));
+  logger.info(`Server running on port ${PORT}`);
 });
-
-module.exports = app;
