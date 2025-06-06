@@ -8,9 +8,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
 </head>
 <body>
-  <!-- Header -->
+  <div id="particles-js"></div>
   <header class="bg-gradient-to-r from-purple-900 to-blue-600 py-4 shadow-lg">
     <div class="container mx-auto px-4 flex justify-between items-center">
       <h1 class="text-3xl font-extrabold neon-text">TKDEV API</h1>
@@ -22,13 +23,11 @@
     </div>
   </header>
 
-  <!-- Main Content -->
   <main class="container mx-auto px-4 py-8">
     <h2 class="text-5xl font-extrabold neon-text mb-8 typing-text">API Documentation</h2>
     <div id="api-list" class="space-y-8"></div>
   </main>
 
-  <!-- Footer -->
   <footer class="bg-gray-900 py-4">
     <div class="container mx-auto px-4 text-center text-cyan-200">
       <p>© 2025 TKDEV - Official Release</p>
@@ -83,6 +82,26 @@
       } catch (error) {
         alert('Failed to copy path: ' + error.message);
       }
+    }
+
+    const isDesktop = window.innerWidth > 768;
+    if (isDesktop) {
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 30, density: { enable: true, value_area: 800 } },
+          color: { value: ['#0ff', '#f0f', '#ff0066', '#00ff99'] },
+          shape: { type: ['circle', 'triangle'], stroke: { width: 1, color: '#0ff' } },
+          opacity: { value: 0.7, random: true },
+          size: { value: 4, random: true },
+          line_linked: { enable: true, distance: 120, color: '#0ff', opacity: 0.6, width: 1 },
+          move: { enable: true, speed: 4, direction: 'none', random: true }
+        },
+        interactivity: {
+          detect_on: 'canvas',
+          events: { onhover: { enable: true, mode: 'grab' }, onclick: { enable: true, mode: 'push' } },
+          modes: { grab: { distance: 150 }, push: { particles_nb: 4 } }
+        }
+      });
     }
 
     fetchApiDocs();
