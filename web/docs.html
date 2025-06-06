@@ -5,78 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="API Documentation - TKDEV API">
   <title>API Documentation</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #1e1e2f 0%, #2a2a4e 100%);
-      color: #fff;
-      overflow-x: hidden;
-    }
-    .neon-text {
-      text-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #f0f;
-    }
-    .neon-card {
-      background: rgba(255, 255, 255, 0.05);
-      border: 2px solid #0ff;
-      transition: transform 0.3s, box-shadow 0.3s;
-      position: relative;
-      overflow: hidden;
-    }
-    .neon-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 0 30px #0ff, 0 0 50px #f0f;
-    }
-    .neon-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
-      transition: 0.5s;
-    }
-    .neon-card:hover::before {
-      left: 100%;
-    }
-    .neon-button {
-      background: linear-gradient(45deg, #ff0066, #00ccff);
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    .neon-button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 20px #0ff, 0 0 30px #f0f;
-    }
-    #particles-js {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-    }
-    @keyframes typing {
-      from { width: 0; }
-      to { width: 100%; }
-    }
-    .typing-text {
-      overflow: hidden;
-      white-space: nowrap;
-      animation: typing 2s steps(40, end) forwards;
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .animate-fadeInUp {
-      animation: fadeInUp 1s ease-out forwards;
-    }
-  </style>
+  <link rel="stylesheet" href="/styles.css">
 </head>
-<body class="min-h-screen flex flex-col">
-  <div id="particles-js"></div>
+<body>
   <!-- Header -->
   <header class="bg-gradient-to-r from-purple-900 to-blue-600 py-4 shadow-lg">
     <div class="container mx-auto px-4 flex justify-between items-center">
@@ -84,7 +17,7 @@
       <nav class="space-x-4">
         <a href="/" class="text-white hover:text-cyan-300"><i class="fas fa-home"></i> Home</a>
         <a href="/docs" class="text-white hover:text-cyan-300"><i class="fas fa-book"></i> Docs</a>
-        <a href="/test-post" class="text-white hover:text-cyan-300"><i class="fas fa-vial"></i> Test API</a>
+        <a href="/login" class="text-white hover:text-cyan-300"><i class="fas fa-sign-in-alt"></i> Login</a>
       </nav>
     </div>
   </header>
@@ -98,7 +31,7 @@
   <!-- Footer -->
   <footer class="bg-gray-900 py-4">
     <div class="container mx-auto px-4 text-center text-cyan-200">
-      <p>© 2025 TKDEV</p>
+      <p>© 2025 TKDEV - Official Release</p>
     </div>
   </footer>
 
@@ -106,6 +39,7 @@
     async function fetchApiDocs() {
       try {
         const response = await fetch('/api/info');
+        if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         const apiList = document.getElementById('api-list');
         data.categories.forEach((category, index) => {
@@ -122,7 +56,7 @@
                   <div class="flex items-center mb-2">
                     <strong class="text-pink-400">Path:</strong>
                     <span class="text-white ml-2 flex-grow">${item.path}</span>
-                    <button onclick="navigator.clipboard.write('${item.path}')"
+                    <button onclick="copyPath('${item.path}')"
                             class="neon-button text-white py-1 px-2 rounded-full text-sm">
                       <i class="fas fa-copy"></i>
                     </button>
@@ -137,28 +71,21 @@
         });
       } catch (error) {
         document.getElementById('api-list').innerHTML = `
-          <p class="text-red-400 neon-text text-xl">Failed to load API docs!</p>
+          <p class="text-red-400 neon-text text-xl">Failed to load API docs! Please try again later.</p>
         `;
       }
     }
-    fetchApiDocs();
 
-    particlesJS('particles-js', {
-      particles: {
-        number: { value: 100, density: { enable: true, value_area: 800 } },
-        color: { value: ['#0ff', '#f0f', '#ff0066', '#00ff99'] },
-        shape: { type: ['circle', 'triangle', 'star'], stroke: { width: 1, color: '#0ff' } },
-        opacity: { value: 0.6, random: true },
-        size: { value: 4, random: true },
-        line_linked: { enable: true, distance: 120, color: '#0ff', opacity: 0.5, width: 1.5 },
-        move: { enable: true, speed: 4, direction: 'none', random: true }
-      },
-      interactivity: {
-        detect_on: 'canvas',
-        events: { onhover: { enable: true, mode: 'grab' }, onclick: { enable: true, mode: 'push' } },
-        modes: { grab: { distance: 150 }, push: { particles_nb: 5 } }
+    async function copyPath(path) {
+      try {
+        await navigator.clipboard.writeText(path);
+        alert('Path copied to clipboard!');
+      } catch (error) {
+        alert('Failed to copy path: ' + error.message);
       }
-    });
+    }
+
+    fetchApiDocs();
   </script>
 </body>
 </html>
