@@ -5,45 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Page not found - TKDEV API">
   <title>404 - Page Not Found</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
-  <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #1e1e2f 0%, #2a2a4e 100%);
-      color: #fff;
-      overflow-x: hidden;
-    }
-    .neon-text {
-      text-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #f0f;
-    }
-    .neon-button {
-      background: linear-gradient(45deg, #ff0066, #00ccff);
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-    .neon-button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 20px #0ff, 0 0 30px #f0f;
-    }
-    #particles-js {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .animate-fadeInUp {
-      animation: fadeInUp 1s ease-out forwards;
-    }
-  </style>
+  <link rel="stylesheet" href="/styles.css">
 </head>
-<body class="min-h-screen flex flex-col">
-  <div id="particles-js"></div>
+<body>
   <!-- Header -->
   <header class="bg-gradient-to-r from-purple-900 to-blue-600 py-4 shadow-lg">
     <div class="container mx-auto px-4 flex justify-between items-center">
@@ -51,7 +17,7 @@
       <nav class="space-x-4">
         <a href="/" class="text-white hover:text-cyan-300"><i class="fas fa-home"></i> Home</a>
         <a href="/docs" class="text-white hover:text-cyan-300"><i class="fas fa-book"></i> Docs</a>
-        <a href="/test-post" class="text-white hover:text-cyan-300"><i class="fas fa-vial"></i> Test API</a>
+        <a href="/login" class="text-white hover:text-cyan-300"><i class="fas fa-sign-in-alt"></i> Login</a>
       </nav>
     </div>
   </header>
@@ -68,27 +34,8 @@
   <!-- Footer -->
   <footer class="bg-gray-900 py-4">
     <div class="container mx-auto px-4 text-center text-cyan-200">
-      <p>© 2025 TKDEV</p>
+      <p>© 2025 TKDEV - Official Release</p>
     </div>
   </footer>
-
-  <script>
-    particlesJS('particles-js', {
-      particles: {
-        number: { value: 80, density: { enable: true, value_area: 800 } },
-        color: { value: ['#0ff', '#f0f', '#ff0066'] },
-        shape: { type: 'circle' },
-        opacity: { value: 0.5, random: true },
-        size: { value: 3, random: true },
-        line_linked: { enable: true, distance: 150, color: '#0ff', opacity: 0.4, width: 1 },
-        move: { enable: true, speed: 3, direction: 'none', random: true }
-      },
-      interactivity: {
-        detect_on: 'canvas',
-        events: { onhover: { enable: true, mode: 'repulse' }, onclick: { enable: true, mode: 'push' } },
-        modes: { repulse: { distance: 100 }, push: { particles_nb: 4 } }
-      }
-    });
-  </script>
 </body>
 </html>
