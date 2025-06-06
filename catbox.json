@@ -1,0 +1,6 @@
+{
+  "videos": [
+    { "id": 1, "url": "https://catbox.moe/video1.mp4", "title": "Video 1" },
+    { "id": 2, "url": "https://catbox.moe/video2.mp4", "title": "Video 2" }
+  ]
+}
