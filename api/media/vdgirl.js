@@ -1,46 +1,20 @@
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
+const ApiError = require('../../apiError');
 
-const meta = {
-  name: "vdgirl",
-  version: "1.0.0",
-  description: "Random Video Girl with Link MP4",
-  author: "TKDEV", 
-  method: "get",
-  category: "media",
-  path: "/vdgirl"
-};
-
-async function onStart({ res }) {
-  try {
-    // Đọc danh sách link mp4 từ file JSON
-    const filePath = path.join(__dirname, 'catbox.json');
-    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-
-    if (!Array.isArray(data) || data.length === 0) {
-      return res.status(500).json({ 
-        status: false, 
-        error: "No video links available." 
-      });
+module.exports = {
+  name: 'vdgirl',
+  desc: 'Fetches video links from catbox.json',
+  author: 'TKDEV',
+  async onStart() {
+    try {
+      const data = await fs.readFile(path.join(__dirname, '../../catbox.json'));
+      this.links = JSON.parse(data);
+    } catch (error) {
+      throw new ApiError(500, 'Failed to load video links', error.message);
     }
-
-    // Random 1 link
-    const randomLink = data[Math.floor(Math.random() * data.length)];
-
-    return res.json({
-      status: true,
-      video: randomLink,
-      timestamp: new Date().toISOString(),
-      powered_by: "TKDEV"
-    });
-
-  } catch (err) {
-    return res.status(500).json({ 
-      status: false, 
-      error: "Internal Server Error", 
-      detail: err.message 
-    });
+  },
+  handler: (req, res) => {
+    res.json({ status: true, links: this.links });
   }
-}
-
-module.exports = { meta, onStart };
+};
