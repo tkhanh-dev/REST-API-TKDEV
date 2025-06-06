@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Login to TKDEV API">
+  <title>Login - TKDEV API</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-purple-900 to-blue-600 py-4 shadow-lg">
+    <div class="container mx-auto px-4 flex justify-between items-center">
+      <h1 class="text-3xl font-extrabold neon-text">TKDEV API</h1>
+      <nav class="space-x-4">
+        <a href="/" class="text-white hover:text-cyan-300"><i class="fas fa-home"></i> Home</a>
+        <a href="/docs" class="text-white hover:text-cyan-300"><i class="fas fa-book"></i> Docs</a>
+        <a href="/login" class="text-white hover:text-cyan-300"><i class="fas fa-sign-in-alt"></i> Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-8">
+    <h2 class="text-4xl font-extrabold neon-text mb-6 animate-fadeInUp">Login to TKDEV API</h2>
+    <div class="max-w-md mx-auto neon-card p-6 rounded-lg animate-fadeInUp" style="animation-delay: 0.2s;">
+      <div class="space-y-4">
+        <div>
+          <label for="username" class="block text-cyan-200">Username</label>
+          <input type="text" id="username" class="w-full neon-input rounded px-3 py-2 text-white" placeholder="Enter username (e.g., test)">
+        </div>
+        <div>
+          <label for="password" class="block text-cyan-200">Password</label>
+          <input type="password" id="password" class="w-full neon-input rounded px-3 py-2 text-white" placeholder="Enter password (e.g., test)">
+        </div>
+        <button onclick="login()" class="w-full neon-button text-white py-3 rounded-full text-lg font-semibold"><i class="fas fa-sign-in-alt mr-2"></i> Login</button>
+        <pre id="response" class="text-sm text-gray-300 mt-4 bg-gray-900 p-4 rounded"></pre>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 py-4">
+    <div class="container mx-auto px-4 text-center text-cyan-200">
+      <p>© 2025 TKDEV - Official Release</p>
+    </div>
+  </footer>
+
+  <script>
+    async function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const responseEl = document.getElementById('response');
+
+      if (!username || !password) {
+        responseEl.className = 'text-red-400 neon-text p-4 rounded';
+        responseEl.textContent = 'Please enter both username and password!';
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        if (!response.ok) throw new Error('Network response was not ok');
+        const data = await response.json();
+        responseEl.className = data.success ? 'text-green-400 p-4 rounded' : 'text-red-400 p-4 rounded';
+        responseEl.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        responseEl.className = 'text-red-400 neon-text p-4 rounded';
+        responseEl.textContent = `Error: ${error.message}`;
+      }
+    }
+  </script>
+</body>
+</html>
