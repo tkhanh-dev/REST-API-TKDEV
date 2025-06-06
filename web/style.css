@@ -1,4 +1,4 @@
-/* Tailwind CSS compiled output (simplified for production) */
+/* Tailwind CSS compiled output with custom enhancements */
 body {
   font-family: 'Poppins', sans-serif;
   background: linear-gradient(135deg, #1e1e2f 0%, #2a2a4e 100%);
@@ -8,6 +8,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 .container {
   width: 100%;
@@ -37,7 +38,7 @@ body {
 .text-orange-400 { color: #fb923c; }
 .bg-gray-900 { background-color: #111827; }
 .bg-gradient-to-r { background-image: linear-gradient(to right, var(--tw-gradient-stops)); }
-.from-purple-900 { --tw-gradient-from: #581c87; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(88, 28, 135, 0)); }
+.from-purple-900 { --tw-gradient-from: #581c87; --tw-gradient-to: rgba(88, 28, 135, 0); }
 .to-blue-600 { --tw-gradient-to: #2563eb; }
 .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
 .px-4 { padding-left: 1rem; padding-right: 1rem; }
@@ -87,9 +88,9 @@ body {
 .text-center { text-align: center; }
 .hover\:text-cyan-300:hover { color: #67e8f9; }
 
-/* Custom styles */
+/* Custom enhancements */
 .neon-text {
-  text-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #f0f;
+  text-shadow: 0 0 15px #0ff, 0 0 30px #0ff, 0 0 40px #f0f, 0 0 50px #ff0066;
 }
 .neon-card {
   background: rgba(255, 255, 255, 0.05);
@@ -99,8 +100,8 @@ body {
   overflow: hidden;
 }
 .neon-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 0 30px #0ff, 0 0 50px #f0f;
+  transform: translateY(-15px);
+  box-shadow: 0 0 40px #0ff, 0 0 60px #f0f;
 }
 .neon-card::before {
   content: '';
@@ -109,28 +110,31 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.3), transparent);
   transition: 0.5s;
 }
 .neon-card:hover::before {
   left: 100%;
 }
 .neon-button {
-  background: linear-gradient(45deg, #ff0066, #00ccff);
-  transition: transform 0.3s, box-shadow 0.3s;
+  background: linear-gradient(45deg, #ff0066, #00ccff, #00ff99);
+  transition: transform 0.3s, box-shadow 0.3s, background-position 0.3s;
+  background-size: 200% 200%;
 }
 .neon-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 20px #0ff, 0 0 30px #f0f;
+  transform: scale(1.1);
+  box-shadow: 0 0 30px #0ff, 0 0 50px #f0f;
+  background-position: right bottom;
 }
 .neon-input {
   background: rgba(255, 255, 255, 0.1);
-  border: 1px solid #0ff;
+  border: 2px solid #0ff;
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 .neon-input:focus {
   border-color: #f0f;
-  box-shadow: 0 0 10px #f0f;
+  box-shadow: 0 0 15px #f0f;
+  outline: none;
 }
 @keyframes typing {
   from { width: 0; }
@@ -139,12 +143,27 @@ body {
 .typing-text {
   overflow: hidden;
   white-space: nowrap;
-  animation: typing 2s steps(40, end) forwards;
+  animation: typing 2.5s steps(40, end) forwards;
 }
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(30px); }
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-fadeInUp {
-  animation: fadeInUp 1s ease-out forwards;
+  animation: fadeInUp 1.2s ease-out forwards;
+}
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+.pulse {
+  animation: pulse 2s infinite;
+}
+@media (max-width: 768px) {
+  .container { padding-left: 0.5rem; padding-right: 0.5rem; }
+  .text-5xl { font-size: 2rem; }
+  .text-6xl { font-size: 2.5rem; }
+  .neon-button { font-size: 1rem; padding: 0.5rem 1rem; }
+  .neon-card:hover { transform: none; }
 }
